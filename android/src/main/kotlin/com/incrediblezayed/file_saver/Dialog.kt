@@ -22,7 +22,7 @@ import java.io.File
 import java.io.OutputStream
 
 
-private const val SAVE_FILE = 19112
+private const val SAVE_FILE = 847238
 
 class Dialog(private val activity: Activity) : PluginRegistry.ActivityResultListener {
     private var result: MethodChannel.Result? = null
@@ -30,12 +30,17 @@ class Dialog(private val activity: Activity) : PluginRegistry.ActivityResultList
     private var fileName: String? = null
     private val TAG = "Dialog Activity"
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        if (requestCode == SAVE_FILE && resultCode == Activity.RESULT_OK && data?.data != null) {
+        if (requestCode != SAVE_FILE) {
+            return false
+        }
+        
+        if (resultCode == Activity.RESULT_OK && data?.data != null) {
             Log.d(TAG, "Starting file operation")
             completeFileOperation(data.data!!)
         } else {
             Log.d(TAG, "Activity result was null")
             result?.success(null)
+            result = null
             return false
         }
         return true
@@ -87,6 +92,8 @@ class Dialog(private val activity: Activity) : PluginRegistry.ActivityResultList
                 Log.d(TAG, "Exception while saving file" + e.message)
                 result?.error("Error", e.localizedMessage, e)
             }
+            
+            result = null
         }
     }
 
